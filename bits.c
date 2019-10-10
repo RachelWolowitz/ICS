@@ -221,8 +221,8 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-    int minus=x+(~y+1);
-return(((minus>>31)&1)|(!(x^y))|(((x>>31)&1)&(!((y>>31)&1))))&(!(!((x>>31)&1)&((y>>31)&1)));
+    int minus=x+(~y+1),x1=(x>>31)&1,y1=(y>>31)&1;
+return(((minus>>31)&1)|(!(x^y))|(x1&(!y1)))&(!(!x1&y1));
 }
 /* 
  * logicalNeg - implement the ! operator, using all of 
@@ -250,19 +250,15 @@ int logicalNeg(int x) {
  *  Max ops: 90
  *  Rating: 4
  */
-int howManyBits(int x)
-{
-    int temp=24,judge=0,x1=0,n=0,sign=x&(1<<31),xpos=((sign>>31)&(~x+1))+((~sign>>31)&x),t=0,zero=0,m=0,x2=0;
-    judge=!(xpos>>24);temp+=(~(judge<<3)+1);
-    judge=!(xpos>>16);temp+=(~(judge<<3)+1);
-    judge=!(xpos>>8);temp+=(~(judge<<3)+1);
-    x2=x1=((0xff<<temp)&xpos)>>temp;
-    x1^=(x1<<1);
-n+=(!!x1)+(!!(x1>>1))+(!!(x1>>2))+(!!(x1>>3))+(!!(x1>>4))+(!!(x1>>5))+(!!(x1>>6))+(!!(x1>>7));
-    t=(!((xpos+(~0))&xpos))&(sign>>31);
-    zero=!x;
-    m=!!((x2&0xFF)&0x80);
-    return n+temp+(~t+1)+m+zero;
+int howManyBits(int x) {
+  int n = 0;
+  x^=(x<<1);//to locate the 1st left 1
+  n+=((!!(x&((~0)<<(n+16)))) << 4);//find the 1st left 1
+  n+=((!!(x&((~0)<<(n+8)))) << 3);
+  n+=((!!(x&((~0)<<(n+4)))) << 2);
+  n+=((!!(x&((~0)<<(n+2)))) << 1);
+  n+=(!!(x&((~0)<<(n+1))));
+  return n+1;
 }
 //float
 /* 
